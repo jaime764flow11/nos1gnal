@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Show Controller — NO S1GNAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #e60382;
+      --pink-glow: rgba(230,3,130,0.5);
+      --black: #050505;
+      --dark: #0d0d0d;
+      --panel: #111;
+      --panel2: #161616;
+      --border: rgba(230,3,130,0.2);
+      --text: #f0f0f0;
+      --muted: #666;
+      --green: #00c97a;
+      --red: #ff3b5c;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--black); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(230,3,130,0.1) 0%, transparent 70%), var(--black);
+    }
+    .login-box {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      padding: 48px 40px; width: 380px; max-width: 92vw; text-align: center;
+      box-shadow: 0 0 60px rgba(230,3,130,0.1);
+    }
+    .login-logo { height: 56px; filter: drop-shadow(0 0 14px var(--pink-glow)); margin-bottom: 28px; }
+    .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.15em; margin-bottom: 6px; }
+    .login-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 32px; }
+    .field { margin-bottom: 16px; text-align: left; }
+    .field label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 12px 14px; background: var(--dark); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; transition: border-color 0.2s; }
+    .field input:focus { outline: none; border-color: var(--pink); }
+    .btn-primary { width: 100%; padding: 14px; margin-top: 8px; background: var(--pink); color: #fff; border: none; border-radius: 3px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; }
+    .btn-primary:hover { background: #ff0a90; box-shadow: 0 0 20px rgba(230,3,130,0.5); }
+    .btn-primary:disabled { background: #333; color: #555; cursor: not-allowed; }
+    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; font-family: 'Barlow Condensed', sans-serif; min-height: 20px; }
+
+    #app-screen { display: none; }
+
+    .topbar { background: var(--dark); border-bottom: 1px solid var(--border); padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-logo { height: 40px; filter: drop-shadow(0 0 8px var(--pink-glow)); }
+    .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.12em; color: var(--pink); }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; padding: 8px 16px; border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 40px 30px; }
+    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.08em; }
+    .sec-title span { color: var(--pink); }
+    .btn-add { display: flex; align-items: center; gap: 8px; background: var(--pink); color: #fff; border: none; border-radius: 3px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; padding: 12px 22px; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; }
+    .btn-add:hover { background: #ff0a90; box-shadow: 0 0 18px rgba(230,3,130,0.5); }
+
+    .shows-list { display: flex; flex-direction: column; gap: 14px; }
+    .show-item { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 18px 22px; display: grid; grid-template-columns: 64px 1fr auto; gap: 16px; align-items: center; transition: border-color 0.2s; }
+    .show-item:hover { border-color: rgba(230,3,130,0.4); }
+    .show-item-thumb { width: 64px; height: 42px; object-fit: cover; border-radius: 2px; background: #1a1a1a; flex-shrink: 0; }
+    .show-item-thumb-ph { width: 64px; height: 42px; background: #1a1a1a; border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .show-item-info { overflow: hidden; }
+    .show-item-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .show-item-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; color: var(--muted); letter-spacing: 0.05em; margin-top: 3px; }
+    .show-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-icon { background: transparent; border: 1px solid var(--border); border-radius: 2px; color: var(--muted); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    .btn-icon.edit:hover { border-color: var(--pink); color: var(--pink); }
+    .btn-icon.del:hover { border-color: var(--red); color: var(--red); }
+    .list-empty, .list-loading { text-align: center; padding: 60px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; letter-spacing: 0.15em; color: var(--muted); }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(230,3,130,0.2); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; padding: 36px 32px; transform: translateY(20px); transition: transform 0.25s; }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 0.1em; margin-bottom: 28px; }
+    .modal-title span { color: var(--pink); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid .full { grid-column: 1/-1; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-field label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; }
+    .form-field input, .form-field select { padding: 11px 13px; background: var(--dark); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; transition: border-color 0.2s; width: 100%; }
+    .form-field input:focus, .form-field select:focus { outline: none; border-color: var(--pink); }
+    .form-field select option { background: #111; }
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    .color-row input[type="color"] { width: 44px; height: 44px; padding: 2px; cursor: pointer; border-radius: 3px; }
+    .color-preview { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 0.1em; color: var(--muted); }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label { font-family: 'Barlow', sans-serif; font-size: 14px; }
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #222; border-radius: 24px; cursor: pointer; transition: background 0.2s; }
+    .toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: var(--muted); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+    .toggle input:checked + .toggle-slider { background: rgba(230,3,130,0.25); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--pink); }
+    .modal-actions { display: flex; gap: 12px; margin-top: 28px; justify-content: flex-end; }
+    .btn-cancel { padding: 12px 24px; background: transparent; border: 1px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+    .btn-save { padding: 12px 28px; background: var(--pink); border: none; border-radius: 3px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; }
+    .btn-save:hover { background: #ff0a90; box-shadow: 0 0 18px rgba(230,3,130,0.5); }
+    .btn-save:disabled { background: #333; color: #555; cursor: not-allowed; }
+
+    .toast { position: fixed; bottom: 28px; right: 28px; z-index: 999; padding: 14px 22px; border-radius: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: #0d2a1e; border: 1px solid var(--green); color: var(--green); }
+    .toast.error { background: #2a0d14; border: 1px solid var(--red); color: var(--red); }
+
+    .confirm-modal { background: var(--panel2); border: 1px solid rgba(255,59,92,0.3); border-radius: 6px; padding: 32px 28px; max-width: 380px; width: 100%; text-align: center; }
+    .confirm-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-bottom: 10px; color: var(--red); }
+    .confirm-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirm-del { padding: 11px 22px; background: var(--red); border: none; border-radius: 3px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; }
+    .btn-confirm-del:hover { background: #ff1a3a; }
+
+    .img-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 3px; display: block; margin-top: 8px; border: 1px solid var(--border); }
+    .img-preview-ph { width: 100%; height: 130px; background: #1a1a1a; border-radius: 3px; border: 1px dashed var(--border); margin-top: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 0.1em; color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: 1; }
+      .show-item { grid-template-columns: 48px 1fr auto; gap: 10px; }
+      .modal { padding: 24px 18px; }
+      .main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="login-screen">
+    <div class="login-box">
+      <img class="login-logo" src="logo.png" alt="NO S1GNAL" onerror="this.style.display='none'" />
+      <div class="login-title">Show Controller</div>
+      <div class="login-sub">Acceso Administrador</div>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com" /></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" /></div>
+      <button class="btn-primary" id="btn-login">Entrar</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+  </div>
+
+  <div id="app-screen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <img class="topbar-logo" src="logo.png" alt="NO S1GNAL" onerror="this.style.display='none'" />
+        <span class="topbar-title">Show Controller</span>
+      </div>
+      <button class="btn-logout" id="btn-logout">Cerrar Sesión</button>
+    </div>
+    <div class="main">
+      <div class="sec-header">
+        <div class="sec-title">Gestión de <span>Shows</span></div>
+        <button class="btn-add" id="btn-new-show">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo Show
+        </button>
+      </div>
+      <div class="shows-list" id="shows-list">
+        <div class="list-loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Nuevo <span>Show</span></div>
+      <div class="form-grid">
+        <div class="form-field full"><label>Título del Show *</label><input type="text" id="f-titulo" placeholder="Ej: Summer Bash 2026" /></div>
+        <div class="form-field"><label>Fecha *</label><input type="date" id="f-fecha" /></div>
+        <div class="form-field"><label>Hora</label><input type="time" id="f-hora" /></div>
+        <div class="form-field full"><label>Lugar</label><input type="text" id="f-lugar" placeholder="Ej: Teatro Principal, Las Palmas" /></div>
+        <div class="form-field full">
+          <label>URL de la Imagen</label>
+          <input type="url" id="f-imagen" placeholder="https://i.imgur.com/abc.jpg" />
+          <div id="img-preview-container"><div class="img-preview-ph">Sin imagen — pega una URL arriba</div></div>
+        </div>
+        <div class="form-field full"><label>URL Compra de Entradas</label><input type="url" id="f-entrada" placeholder="https://entradas.com/..." /></div>
+        <div class="form-field">
+          <label>Color Acento</label>
+          <div class="color-row"><input type="color" id="f-color" value="#e60382" /><span class="color-preview" id="color-hex">#e60382</span></div>
+        </div>
+        <div class="form-field">
+          <label>Badge / Etiqueta</label>
+          <select id="f-badge">
+            <option value="">Sin etiqueta</option>
+            <option value="NUEVO">NUEVO</option>
+            <option value="POCOS">POCOS</option>
+            <option value="AGOTADO">AGOTADO</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <div class="toggle-row">
+            <span class="toggle-label">Marcar como Agotado (desactiva botón de compra)</span>
+            <label class="toggle"><input type="checkbox" id="f-agotado" /><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
+        <button class="btn-save" id="btn-modal-save">Guardar Show</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM DELETE -->
+  <div class="modal-overlay" id="confirm-overlay">
+    <div class="confirm-modal">
+      <div class="confirm-title">Eliminar Show</div>
+      <p class="confirm-text">Esta acción es irreversible. El show se borrará permanentemente.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" id="btn-confirm-cancel">Cancelar</button>
+        <button class="btn-confirm-del" id="btn-confirm-del">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const app = initializeApp({
+      apiKey: "AIzaSyCBJAbOIK4pUSL97XZeQsTKuSVhNmqEyAY",
+      authDomain: "nosignalweb26.firebaseapp.com",
+      projectId: "nosignalweb26",
+      storageBucket: "nosignalweb26.firebasestorage.app",
+      messagingSenderId: "75900873115",
+      appId: "1:75900873115:web:b2d7f2f119d068456f993e"
+    });
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+        loadShows();
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-screen').style.display = 'none';
+      }
+    });
+
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const pass  = document.getElementById('login-pass').value;
+      const errEl = document.getElementById('login-error');
+      const btn   = document.getElementById('btn-login');
+      errEl.textContent = '';
+      btn.disabled = true; btn.textContent = 'Entrando...';
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch(e) {
+        errEl.textContent = 'Email o contraseña incorrectos.';
+        btn.disabled = false; btn.textContent = 'Entrar';
+      }
+    });
+
+    ['login-email','login-pass'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+    let shows = [], editingId = null, deletingId = null;
+
+    async function loadShows() {
+      const list = document.getElementById('shows-list');
+      list.innerHTML = '<div class="list-loading"><div class="spinner"></div></div>';
+      try {
+        const snap = await getDocs(query(collection(db, 'shows'), orderBy('fecha', 'asc')));
+        shows = [];
+        snap.forEach(d => shows.push({ id: d.id, ...d.data() }));
+        renderList();
+      } catch(e) {
+        list.innerHTML = '<div class="list-empty">Error cargando shows.</div>';
+      }
+    }
+
+    function renderList() {
+      const list = document.getElementById('shows-list');
+      if (!shows.length) { list.innerHTML = '<div class="list-empty">No hay shows. Crea el primero pulsando "Nuevo Show".</div>'; return; }
+      list.innerHTML = '';
+      shows.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'show-item';
+        const accent = s.accentColor || '#e60382';
+        let thumb = s.imagenUrl
+          ? `<img class="show-item-thumb" src="${s.imagenUrl}" alt="" onerror="this.outerHTML='<div class=show-item-thumb-ph></div>'" />`
+          : `<div class="show-item-thumb-ph"></div>`;
+        item.innerHTML = `
+          ${thumb}
+          <div class="show-item-info">
+            <div class="show-item-title" style="color:${accent}">${s.titulo||'Sin título'}</div>
+            <div class="show-item-meta">${formatDate(s.fecha)} · ${s.hora||'--:--'} · ${s.lugar||'Sin lugar'}${s.agotado?' · <span style="color:var(--red)">AGOTADO</span>':''}</div>
+          </div>
+          <div class="show-item-actions">
+            <button class="btn-icon edit" title="Editar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="btn-icon del" title="Eliminar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          </div>`;
+        item.querySelector('.btn-icon.edit').addEventListener('click', () => openEdit(s.id));
+        item.querySelector('.btn-icon.del').addEventListener('click', () => openConfirmDelete(s.id));
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById('btn-new-show').addEventListener('click', openNew);
+    document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    function openNew() {
+      editingId = null;
+      document.getElementById('modal-title').innerHTML = 'Nuevo <span>Show</span>';
+      clearForm();
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function openEdit(id) {
+      editingId = id;
+      const s = shows.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('modal-title').innerHTML = 'Editar <span>Show</span>';
+      document.getElementById('f-titulo').value  = s.titulo || '';
+      document.getElementById('f-fecha').value   = toInputDate(s.fecha);
+      document.getElementById('f-hora').value    = s.hora || '';
+      document.getElementById('f-lugar').value   = s.lugar || '';
+      document.getElementById('f-imagen').value  = s.imagenUrl || '';
+      document.getElementById('f-entrada').value = s.entradaUrl || '';
+      document.getElementById('f-color').value   = s.accentColor || '#e60382';
+      document.getElementById('color-hex').textContent = s.accentColor || '#e60382';
+      document.getElementById('f-badge').value   = s.badge || '';
+      document.getElementById('f-agotado').checked = !!s.agotado;
+      updateImgPreview(s.imagenUrl || '');
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); editingId = null; }
+
+    function clearForm() {
+      ['f-titulo','f-fecha','f-hora','f-lugar','f-imagen','f-entrada'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-color').value = '#e60382';
+      document.getElementById('color-hex').textContent = '#e60382';
+      document.getElementById('f-badge').value = '';
+      document.getElementById('f-agotado').checked = false;
+      updateImgPreview('');
+    }
+
+    document.getElementById('f-imagen').addEventListener('input', e => updateImgPreview(e.target.value));
+    function updateImgPreview(url) {
+      const c = document.getElementById('img-preview-container');
+      if (url) {
+        c.innerHTML = `<img class="img-preview" src="${url}" alt="preview" onerror="document.getElementById('img-preview-container').innerHTML='<div class=img-preview-ph>URL no accesible o inválida</div>'" />`;
+      } else {
+        c.innerHTML = '<div class="img-preview-ph">Sin imagen — pega una URL arriba</div>';
+      }
+    }
+
+    document.getElementById('f-color').addEventListener('input', e => { document.getElementById('color-hex').textContent = e.target.value; });
+
+    document.getElementById('btn-modal-save').addEventListener('click', async () => {
+      const titulo = document.getElementById('f-titulo').value.trim();
+      const fecha  = document.getElementById('f-fecha').value;
+      if (!titulo || !fecha) { showToast('El título y la fecha son obligatorios.', 'error'); return; }
+      const btn = document.getElementById('btn-modal-save');
+      btn.disabled = true; btn.textContent = 'Guardando...';
+      const data = {
+        titulo, fecha,
+        hora:        document.getElementById('f-hora').value || '',
+        lugar:       document.getElementById('f-lugar').value.trim(),
+        imagenUrl:   document.getElementById('f-imagen').value.trim(),
+        entradaUrl:  document.getElementById('f-entrada').value.trim(),
+        accentColor: document.getElementById('f-color').value,
+        badge:       document.getElementById('f-badge').value,
+        agotado:     document.getElementById('f-agotado').checked,
+        updatedAt:   serverTimestamp()
+      };
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, 'shows', editingId), data);
+          showToast('Show actualizado.', 'success');
+        } else {
+          data.createdAt = serverTimestamp();
+          await addDoc(collection(db, 'shows'), data);
+          showToast('Show creado.', 'success');
+        }
+        closeModal();
+        await loadShows();
+      } catch(e) {
+        console.error(e);
+        showToast('Error al guardar.', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Guardar Show';
+      }
+    });
+
+    function openConfirmDelete(id) { deletingId = id; document.getElementById('confirm-overlay').classList.add('open'); }
+    document.getElementById('btn-confirm-cancel').addEventListener('click', () => { document.getElementById('confirm-overlay').classList.remove('open'); deletingId = null; });
+    document.getElementById('confirm-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) { document.getElementById('confirm-overlay').classList.remove('open'); deletingId = null; } });
+    document.getElementById('btn-confirm-del').addEventListener('click', async () => {
+      if (!deletingId) return;
+      const btn = document.getElementById('btn-confirm-del');
+      btn.disabled = true; btn.textContent = 'Eliminando...';
+      try {
+        await deleteDoc(doc(db, 'shows', deletingId));
+        showToast('Show eliminado.', 'success');
+        document.getElementById('confirm-overlay').classList.remove('open');
+        deletingId = null;
+        await loadShows();
+      } catch(e) {
+        showToast('Error al eliminar.', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Eliminar';
+      }
+    });
+
+    function formatDate(f) {
+      if (!f) return '—';
+      const d = f.toDate ? f.toDate() : new Date(f);
+      return d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+    }
+    function toInputDate(f) {
+      if (!f) return '';
+      const d = f.toDate ? f.toDate() : new Date(f);
+      return d.toISOString().split('T')[0];
+    }
+    function showToast(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3200);
+    }
+  </script>
+</body>
+</html>

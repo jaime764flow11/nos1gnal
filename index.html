@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NO S1GNAL — Dance Crew</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #e60382;
+      --pink-glow: rgba(230,3,130,0.6);
+      --black: #050505;
+      --dark: #0d0d0d;
+      --card-bg: #111111;
+      --text: #f0f0f0;
+      --text-muted: #888;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--text); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+    /* NOISE */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.3;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px 40px;
+      background: linear-gradient(to bottom, rgba(5,5,5,0.97) 60%, transparent);
+    }
+    .logo-img {
+      height: 64px;
+      filter: drop-shadow(0 0 16px var(--pink-glow));
+      transition: filter 0.3s;
+    }
+    .logo-img:hover { filter: drop-shadow(0 0 30px var(--pink)); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding-top: 100px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(230,3,130,0.13) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 15% 85%, rgba(230,3,130,0.06) 0%, transparent 60%),
+        var(--black);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(230,3,130,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(230,3,130,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+    }
+    .scanline {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(to bottom, transparent, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+      pointer-events: none; z-index: 1;
+    }
+    .hero-content {
+      position: relative; z-index: 2; text-align: center;
+      animation: fadeUp 1s ease both;
+    }
+    .hero-logo {
+      width: min(500px, 82vw);
+      filter: drop-shadow(0 0 40px var(--pink-glow)) drop-shadow(0 0 80px rgba(230,3,130,0.3));
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%,100% { filter: drop-shadow(0 0 40px var(--pink-glow)) drop-shadow(0 0 80px rgba(230,3,130,0.3)); }
+      50% { filter: drop-shadow(0 0 65px var(--pink)) drop-shadow(0 0 130px rgba(230,3,130,0.5)); }
+    }
+    .hero-tagline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(12px, 1.8vw, 17px);
+      font-weight: 600; letter-spacing: 0.45em; color: var(--text-muted);
+      text-transform: uppercase; margin-top: 22px;
+      animation: fadeUp 1s 0.35s ease both;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 38px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 10px; letter-spacing: 0.35em;
+      text-transform: uppercase; animation: scrollBounce 2s ease-in-out infinite;
+    }
+    .hero-scroll::after {
+      content: ''; width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--pink), transparent);
+    }
+    @keyframes scrollBounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(9px); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(to right, transparent, var(--pink), transparent);
+      opacity: 0.35; max-width: 1200px; margin: 0 auto;
+    }
+
+    /* SECTION */
+    section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.5em;
+      color: var(--pink); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(46px, 7vw, 78px); line-height: 0.95;
+      color: var(--text); margin-bottom: 56px;
+    }
+    .section-title span { color: var(--pink); }
+
+    /* SHOWS */
+    #shows { padding-top: 120px; }
+    .shows-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
+    }
+    .show-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(230,3,130,0.15);
+      border-radius: 3px; overflow: hidden; position: relative;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .show-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--pink);
+      box-shadow: 0 18px 55px rgba(230,3,130,0.22);
+    }
+    .show-card-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+      filter: saturate(0.85); transition: filter 0.35s;
+    }
+    .show-card:hover .show-card-img { filter: saturate(1.2); }
+    .show-card-img-ph {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #161616, #1e1e1e);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .show-card-img-ph svg { opacity: 0.18; }
+    .show-card-body { padding: 20px; }
+    .show-card-date {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.3em;
+      color: var(--pink); text-transform: uppercase; margin-bottom: 7px;
+    }
+    .show-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 27px; line-height: 1; color: var(--text); margin-bottom: 14px;
+    }
+    .show-card-meta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .meta-row {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em;
+    }
+    .btn-ticket {
+      display: block; width: 100%; padding: 13px 0;
+      background: var(--pink); color: #fff; border: none; border-radius: 2px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; text-align: center; text-decoration: none;
+      cursor: pointer; transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .btn-ticket:hover { background: #ff0a90; box-shadow: 0 0 22px rgba(230,3,130,0.65); transform: scale(1.02); }
+    .btn-ticket.sold { background: #222; color: #555; cursor: not-allowed; pointer-events: none; }
+    .btn-ticket.soon { background: #1a1a1a; color: #555; cursor: default; pointer-events: none; }
+    .show-badge {
+      position: absolute; top: 10px; right: 10px;
+      padding: 4px 9px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      border-radius: 2px;
+    }
+    .badge-AGOTADO { background: #1a1a1a; color: #555; border: 1px solid #2a2a2a; }
+    .badge-POCOS { background: rgba(230,3,130,0.18); color: var(--pink); border: 1px solid var(--pink); }
+    .badge-NUEVO { background: var(--pink); color: #fff; }
+    .shows-empty, .shows-loading {
+      grid-column: 1/-1; text-align: center; padding: 70px 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px; letter-spacing: 0.12em; color: var(--text-muted);
+    }
+    .spinner {
+      width: 38px; height: 38px;
+      border: 3px solid rgba(230,3,130,0.2); border-top-color: var(--pink);
+      border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* MEMBERS */
+    #members { max-width: 100%; padding: 100px 0; }
+    .members-header { max-width: 1200px; margin: 0 auto 48px; padding: 0 40px; }
+    .members-banner {
+      width: 100%; max-height: 540px; object-fit: cover; object-position: center top;
+      display: block; filter: saturate(0.88) contrast(1.05);
+      transition: filter 0.5s;
+    }
+    .members-banner:hover { filter: saturate(1.15) contrast(1.08); }
+    .members-ph {
+      width: 100%; height: 380px;
+      background: linear-gradient(135deg, #111, #1a1a1a, #111);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+      color: var(--text-muted); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; letter-spacing: 0.2em; text-align: center;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(230,3,130,0.18);
+      padding: 52px 40px 38px; text-align: center;
+    }
+    .footer-logo {
+      height: 52px;
+      filter: drop-shadow(0 0 10px var(--pink-glow));
+      margin-bottom: 26px;
+    }
+    .footer-socials { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
+    .social-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px;
+      border: 1px solid rgba(230,3,130,0.28); border-radius: 50%;
+      color: var(--text-muted); text-decoration: none;
+      transition: border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    .social-btn:hover {
+      border-color: var(--pink); color: var(--pink);
+      box-shadow: 0 0 18px rgba(230,3,130,0.45); transform: scale(1.12);
+    }
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; letter-spacing: 0.22em; color: #3a3a3a; text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      section { padding: 70px 20px; }
+      .members-header { padding: 0 20px; }
+      footer { padding: 40px 20px 30px; }
+      header { padding: 14px 20px; }
+    }
+    @media (max-width: 480px) {
+      .shows-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="#"><img class="logo-img" src="logo.png" alt="NO S1GNAL" /></a>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="scanline"></div>
+    <div class="hero-content">
+      <img class="hero-logo" src="logo.png" alt="NO S1GNAL" />
+      <p class="hero-tagline">Dance Crew &nbsp;·&nbsp; Energía &nbsp;·&nbsp; Movimiento &nbsp;·&nbsp; Pasión</p>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SHOWS -->
+  <section id="shows">
+    <div class="section-label">Agenda</div>
+    <div class="section-title">Próximos <span>Shows</span></div>
+    <div class="shows-grid" id="shows-grid">
+      <div class="shows-loading"><div class="spinner"></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MEMBERS -->
+  <section id="members">
+    <div class="members-header">
+      <div class="section-label">El equipo</div>
+      <div class="section-title">Nuestros <span>Miembros</span></div>
+    </div>
+    <img
+      class="members-banner"
+      id="members-img"
+      src="members.jpg"
+      alt="Miembros de NO S1GNAL"
+      onerror="this.style.display='none';document.getElementById('members-ph').style.display='flex';"
+    />
+    <div class="members-ph" id="members-ph" style="display:none;">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e60382" stroke-width="1.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Sube la foto del grupo como <strong>members.jpg</strong> en tu servidor</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <img class="footer-logo" src="logo.png" alt="NO S1GNAL" />
+    <div class="footer-socials">
+      <a class="social-btn" href="https://www.tiktok.com/@no.s1gnal_official" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 1 0 4.67 6.13l-.04-8.37a8.2 8.2 0 0 0 4.8 1.54V5.03a4.85 4.85 0 0 1-1-.34z"/>
+        </svg>
+      </a>
+      <a class="social-btn" href="https://www.instagram.com/no.s1gnal_official/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      </a>
+    </div>
+    <p class="footer-copy">NO S1GNAL 2026 &nbsp;·&nbsp; Todos los derechos reservados</p>
+  </footer>
+
+  <!-- FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const app = initializeApp({
+      apiKey: "AIzaSyCBJAbOIK4pUSL97XZeQsTKuSVhNmqEyAY",
+      authDomain: "nosignalweb26.firebaseapp.com",
+      projectId: "nosignalweb26",
+      storageBucket: "nosignalweb26.firebasestorage.app",
+      messagingSenderId: "75900873115",
+      appId: "1:75900873115:web:b2d7f2f119d068456f993e"
+    });
+    const db = getFirestore(app);
+
+    async function loadShows() {
+      const grid = document.getElementById('shows-grid');
+      try {
+        const snap = await getDocs(query(collection(db, 'shows'), orderBy('fecha', 'asc')));
+        if (snap.empty) {
+          grid.innerHTML = `<div class="shows-empty">Próximamente nuevos shows. ¡Estáte atento!</div>`;
+          return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(doc => grid.appendChild(buildCard(doc.data())));
+      } catch(e) {
+        console.error(e);
+        grid.innerHTML = `<div class="shows-empty">Error cargando shows.</div>`;
+      }
+    }
+
+    function buildCard(s) {
+      const card = document.createElement('div');
+      card.className = 'show-card';
+      const accent = s.accentColor || '#e60382';
+
+      let imgHTML = s.imagenUrl
+        ? `<img class="show-card-img" src="${s.imagenUrl}" alt="${s.titulo||''}" onerror="this.outerHTML='<div class=show-card-img-ph><svg width=40 height=40 viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%23e60382\\' stroke-width=\\'1\\'><rect x=\\'3\\' y=\\'3\\' width=\\'18\\' height=\\'18\\' rx=\\'2\\'/></svg></div>'" />`
+        : `<div class="show-card-img-ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e60382" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-4 4 4"/><circle cx="8.5" cy="13.5" r="1.5"/></svg></div>`;
+
+      let badge = s.badge ? `<span class="show-badge badge-${s.badge}">${s.badge}</span>` : '';
+
+      let btn = s.agotado
+        ? `<button class="btn-ticket sold" disabled>Agotado</button>`
+        : s.entradaUrl
+          ? `<a class="btn-ticket" href="${s.entradaUrl}" target="_blank">Comprar Entrada</a>`
+          : `<button class="btn-ticket soon" disabled>Próximamente</button>`;
+
+      card.style.borderColor = accent + '30';
+      card.innerHTML = `
+        ${imgHTML}${badge}
+        <div class="show-card-body">
+          <div class="show-card-date">${formatDate(s.fecha)}</div>
+          <div class="show-card-title" style="color:${accent}">${s.titulo||'Show'}</div>
+          <div class="show-card-meta">
+            <div class="meta-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>${s.lugar||'—'}</span>
+            </div>
+            <div class="meta-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${s.hora||'—'}</span>
+            </div>
+          </div>
+          ${btn}
+        </div>`;
+      return card;
+    }
+
+    function formatDate(f) {
+      if (!f) return '—';
+      const d = f.toDate ? f.toDate() : new Date(f);
+      return d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+
+    loadShows();
+  </script>
+</body>
+</html>
