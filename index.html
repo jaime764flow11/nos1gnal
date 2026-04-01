@@ -185,6 +185,8 @@
     .btn-ticket:hover { background: #ff0a90; box-shadow: 0 0 22px rgba(230,3,130,0.65); transform: scale(1.02); }
     .btn-ticket.sold { background: #222; color: #555; cursor: not-allowed; pointer-events: none; }
     .btn-ticket.soon { background: #1a1a1a; color: #555; cursor: default; pointer-events: none; }
+    .btn-ticket.info { background: transparent; border: 1px solid var(--pink); color: var(--pink); }
+    .btn-ticket.info:hover { background: rgba(230,3,130,0.12); box-shadow: 0 0 18px rgba(230,3,130,0.3); transform: scale(1.02); }
     .show-badge {
       position: absolute; top: 10px; right: 10px;
       padding: 4px 9px;
@@ -378,11 +380,23 @@
 
       let badge = s.badge ? `<span class="show-badge badge-${s.badge}">${s.badge}</span>` : '';
 
-      let btn = s.agotado
-        ? `<button class="btn-ticket sold" disabled>Agotado</button>`
-        : s.entradaUrl
-          ? `<a class="btn-ticket" href="${s.entradaUrl}" target="_blank">Comprar Entrada</a>`
-          : `<button class="btn-ticket soon" disabled>Próximamente</button>`;
+      let btn;
+      if (s.agotado) {
+        btn = `<button class="btn-ticket sold" disabled>Agotado</button>`;
+      } else {
+        const type = s.btnType || (s.entradaUrl ? 'tickets' : 'none');
+        if (type === 'none') {
+          btn = '';
+        } else if (type === 'info') {
+          btn = s.entradaUrl
+            ? `<a class="btn-ticket info" href="${s.entradaUrl}" target="_blank">Más Información →</a>`
+            : `<button class="btn-ticket info" disabled>Más Información</button>`;
+        } else {
+          btn = s.entradaUrl
+            ? `<a class="btn-ticket" href="${s.entradaUrl}" target="_blank">Comprar Entrada →</a>`
+            : `<button class="btn-ticket soon" disabled>Próximamente</button>`;
+        }
+      }
 
       card.style.borderColor = accent + '30';
       card.innerHTML = `
