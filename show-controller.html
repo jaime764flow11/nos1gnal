@@ -182,7 +182,27 @@
           <input type="url" id="f-imagen" placeholder="https://i.imgur.com/abc.jpg" />
           <div id="img-preview-container"><div class="img-preview-ph">Sin imagen — pega una URL arriba</div></div>
         </div>
-        <div class="form-field full"><label>URL Compra de Entradas</label><input type="url" id="f-entrada" placeholder="https://entradas.com/..." /></div>
+        <div class="form-field full">
+          <label>Tipo de Botón</label>
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:9px 14px;border:1px solid var(--border);border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);transition:all 0.2s" id="lbl-btn-tickets">
+              <input type="radio" name="f-btntype" id="f-btntype-tickets" value="tickets" checked style="accent-color:var(--pink)" onchange="onBtnTypeChange()"/>
+              🎟️ Comprar Entradas
+            </label>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:9px 14px;border:1px solid var(--border);border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);transition:all 0.2s" id="lbl-btn-info">
+              <input type="radio" name="f-btntype" id="f-btntype-info" value="info" style="accent-color:var(--pink)" onchange="onBtnTypeChange()"/>
+              ℹ️ Más Información
+            </label>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:9px 14px;border:1px solid var(--border);border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);transition:all 0.2s" id="lbl-btn-none">
+              <input type="radio" name="f-btntype" id="f-btntype-none" value="none" style="accent-color:var(--pink)" onchange="onBtnTypeChange()"/>
+              🚫 Sin Botón
+            </label>
+          </div>
+          <div id="entrada-url-row">
+            <input type="url" id="f-entrada" placeholder="https://entradas.com/..." />
+            <p id="entrada-hint" style="font-size:11px;color:var(--muted);margin-top:5px">URL a la que lleva el botón</p>
+          </div>
+        </div>
         <div class="form-field">
           <label>Color Acento</label>
           <div class="color-row"><input type="color" id="f-color" value="#e60382" /><span class="color-preview" id="color-hex">#e60382</span></div>
@@ -340,6 +360,10 @@
       document.getElementById('color-hex').textContent = s.accentColor || '#e60382';
       document.getElementById('f-badge').value   = s.badge || '';
       document.getElementById('f-agotado').checked = !!s.agotado;
+      // Restore button type
+      const btnType = s.btnType || 'tickets';
+      document.querySelector(`input[name="f-btntype"][value="${btnType}"]`).checked = true;
+      applyBtnType(btnType);
       updateImgPreview(s.imagenUrl || '');
       document.getElementById('modal-overlay').classList.add('open');
     }
@@ -352,7 +376,31 @@
       document.getElementById('color-hex').textContent = '#e60382';
       document.getElementById('f-badge').value = '';
       document.getElementById('f-agotado').checked = false;
+      document.getElementById('f-btntype-tickets').checked = true;
+      applyBtnType('tickets');
       updateImgPreview('');
+    }
+
+    // Exposed globally for inline onchange
+    window.onBtnTypeChange = () => {
+      const val = document.querySelector('input[name="f-btntype"]:checked').value;
+      applyBtnType(val);
+    };
+
+    function applyBtnType(type) {
+      const row = document.getElementById('entrada-url-row');
+      const hint = document.getElementById('entrada-hint');
+      if (type === 'none') {
+        row.style.display = 'none';
+      } else {
+        row.style.display = 'block';
+        hint.textContent = type === 'info'
+          ? 'URL a la que lleva el botón "Más Información"'
+          : 'URL a la que lleva el botón de compra de entradas';
+        document.getElementById('f-entrada').placeholder = type === 'info'
+          ? 'https://instagram.com/... o cualquier enlace'
+          : 'https://entradas.com/...';
+      }
     }
 
     document.getElementById('f-imagen').addEventListener('input', e => updateImgPreview(e.target.value));
@@ -379,6 +427,7 @@
         lugar:       document.getElementById('f-lugar').value.trim(),
         imagenUrl:   document.getElementById('f-imagen').value.trim(),
         entradaUrl:  document.getElementById('f-entrada').value.trim(),
+        btnType:     document.querySelector('input[name="f-btntype"]:checked').value,
         accentColor: document.getElementById('f-color').value,
         badge:       document.getElementById('f-badge').value,
         agotado:     document.getElementById('f-agotado').checked,
